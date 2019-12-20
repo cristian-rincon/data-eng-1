@@ -7,6 +7,6 @@ Learning data engineering.
 
 - Download conda from : https://www.anaconda.com/distribution/
 
-- run ``prepare_env.sh``.
+- run ``prepare_env.sh``
 
-- run conda activate
+- run ``conda activate``
