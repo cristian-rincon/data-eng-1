@@ -7,6 +7,15 @@ Learning data engineering.
 
 - Download conda from : https://www.anaconda.com/distribution/
 
-- run ``prepare_env.sh``
+- Run 
+            
+        prepare_env.sh
 
-- run ``conda activate``
+- Run 
+
+        conda activate
+
+- If jupyter notebooks don't run: 
+
+
+        conda install -c conda-forge jupyterlab
