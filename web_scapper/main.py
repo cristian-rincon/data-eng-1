@@ -1,4 +1,6 @@
 import argparse
+import csv
+import datetime
 import logging
 import re
 
@@ -11,7 +13,8 @@ from common import config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-is_well_formed_link = re.compile(r"^https?://.+/.+$")  # https://conexe.co/hello
+is_well_formed_link = re.compile(
+    r"^https?://.+/.+$")  # https://conexe.co/hello
 is_root_path = re.compile(r"^/.+$")  # /hello
 
 
@@ -30,10 +33,23 @@ def _news_scraper(news_site_uid):
         if article:
             logger.info("¡¡¡Yei, Article fetched!!!")
             articles.append(article)
-            print(article.title)
 
-    print(len(articles))
+    _save_articles(news_site_uid, articles)
 
+
+def _save_articles(news_site_uid, articles):
+    now = datetime.datetime.now().strftime('%Y_%m_%d')
+    out_file_name = f'{news_site_uid}_{now}_articles.csv'
+    csv_headers = list(
+        filter(lambda property: not property.startswith('_'), dir(articles[0])))
+
+    with open(out_file_name, mode='w+') as f:
+        writer = csv.writer(f)
+        writer.writerow(csv_headers)
+
+        for article in articles:
+            row = [str(getattr(article, prop))for prop in csv_headers]
+            writer.writerow(row)
 
 def _fetch_article(news_site_uid, host, link):
 
@@ -64,7 +80,7 @@ def _build_link(host, link):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    
+
     news_site_choises = list(config()["news_sites"].keys())
     parser.add_argument(
         "news_site",

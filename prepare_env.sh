@@ -1,3 +1,3 @@
-conda create --name data_eng_1 beautifulsoup4 requests numpy pandas matplotlib yaml
+conda create --name data-eng-1 beautifulsoup4 requests numpy pandas matplotlib yaml
 
-conda activate data_eng_1
+conda activate data-eng-1
