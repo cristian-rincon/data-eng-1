@@ -3,9 +3,14 @@ from urllib.parse import urlparse
 import argparse
 import hashlib
 import logging
+
+# Nltk config
+import nltk
+from nltk.corpus import stopwords
+nltk.download('punkt')
+nltk.download('stopwords')
+
 logging.basicConfig(level=logging.INFO)
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -19,6 +24,8 @@ def main(filename):
     df = _fill_missing_titles(df)
     df = _generate_uids_for_rows(df)
     df = _remove_new_lines_from_body(df)
+    df = _tokenize_column(df, 'title')
+    df = _tokenize_column(df, 'body')
 
     return df
 
@@ -56,9 +63,9 @@ def _fill_missing_titles(df):
     missing_titles_mask = df['title'].isna()
 
     missing_titles = (df[missing_titles_mask]['url']
-                        .str.extract(r'(?P<missing_titles>[^/]+)$')
-                        .applymap(lambda title: title.split('-'))
-                        .applymap(lambda title_word_list: ' '.join(title_word_list)))
+                    .str.extract(r'(?P<missing_titles>[^/]+)$')
+                    .applymap(lambda title: title.split('-'))
+                    .applymap(lambda title_word_list: ' '.join(title_word_list)))
     df.loc[missing_titles_mask, 'title'] = missing_titles.loc[:, 'missing_titles']
 
     return df
@@ -72,13 +79,12 @@ def _generate_uids_for_rows(df):
             )
 
     df['uid'] = uids
-    
+
     return df.set_index('uid')
 
 
 def _remove_new_lines_from_body(df):
     logger.info('Remove new lines from body.')
-    
     stripped_body = (df
                     .apply(lambda row: row['body'], axis=1)
                     .apply(lambda body: list(body))
@@ -86,9 +92,28 @@ def _remove_new_lines_from_body(df):
                     .apply(lambda letters: ''.join(letters))
                     )
     df['body'] = stripped_body
-    
+
     return df
-    
+
+
+def _tokenize_column(df, column_name):
+    logger.info(
+        'Calculating the number of unique tokens in {}'.format(column_name))
+    stop_words = set(stopwords.words('spanish'))
+
+    n_tokens = (df
+                .dropna()
+                .apply(lambda row: nltk.word_tokenize(row[column_name]), axis=1)
+                .apply(lambda tokens: list(filter(lambda token: token.isalpha(), tokens)))
+                .apply(lambda tokens: list(map(lambda token: token.lower(), tokens)))
+                .apply(lambda word_list: list(filter(lambda word: word not in stop_words, word_list)))
+                .apply(lambda valid_word_list: len(valid_word_list))
+                )
+
+    df['n_tokens_' + column_name] = n_tokens
+
+    return df
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
