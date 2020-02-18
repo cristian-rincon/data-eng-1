@@ -66,7 +66,7 @@ def _save_articles(news_site_uid, articles):
     now = datetime.datetime.now()
     csv_headers = list(
         filter(lambda property: not property.startswith('_'), dir(articles[0])))
-    out_file_name = '{news_site_uid}_{datetime}_articles.csv'.format(
+    out_file_name = 'datasets/{news_site_uid}_{datetime}_articles.csv'.format(
         news_site_uid=news_site_uid, datetime=now.strftime('%Y_%m_%d'))
 
     with open(out_file_name, mode='w+') as f:
