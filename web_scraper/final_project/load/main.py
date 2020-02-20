@@ -1,9 +1,9 @@
+from base import Base, engine, Session
+from article import Article
+import pandas as pd
 import argparse
 import logging
 logging.basicConfig(level=logging.INFO)
-import pandas as pd
-from article import Article
-from base import Base, engine, Session
 
 
 logger = logging.getLogger(__name__)
@@ -16,15 +16,8 @@ def main(filename):
 
     for index, row in articles.iterrows():
         logger.info('Loading article uid {} into DB'.format(row['uid']))
-        article = Article(row['uid'],
-                          row['body'],
-                          row['host'],
-                          row['title'],
-                          row['newspaper_uid'],
-                          row['n_tokens_body'],
-                          row['n_tokens_title'],
-                          row['url'])
-
+        article = Article(row['uid'], row['body'], row['host'], row['title'],
+                        row['newspaper_uid'], row['n_tokens_body'], row['n_tokens_title'], row['url'])
         session.add(article)
 
     session.commit()

@@ -15,15 +15,7 @@ class Article(Base):
     n_tokens_title = Column(Integer)
     url = Column(String, unique=True)
 
-    def __init__(self,
-                uid,
-                body,
-                host,
-                newspaper_uid,
-                n_tokens_body,
-                n_tokens_title,
-                title,
-                url):
+    def __init__(self, uid, body, host, newspaper_uid, n_tokens_body, n_tokens_title, title, url):
         self.id = uid
         self.body = body
         self.host = host
